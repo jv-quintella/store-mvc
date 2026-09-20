@@ -3,7 +3,8 @@ from model.product.product_category import ProductType
 from model.product.pricing import PricingPolicy
 
 #https://docs.python.org/3/library/dataclasses.html
-#Feat: Changed dataclasses to normal classes so that if statements could be used to verify empty lists or negative prices
+#https://stackoverflow.com/questions/67432117/if-else-in-python-dataclasses
+#Refactor: SKU foi transformado em classe para implementar um if que valida precos negativos
 class SKU():
     def __init__(self, code):
         if not code.strip():
@@ -11,7 +12,8 @@ class SKU():
         self.code = code
     def __str__(self):
         return self.code
-
+    
+#Refactor: Price foi transformado em classe ao inves de dataclass para verificar se a lista esta vazia
 class Price:
     def __init__(self, amount: float):
         if amount < 0:
@@ -50,14 +52,14 @@ class Product:
         return self._policy
     
     # Setters
-    #Feat: Changed discount to pricing policy so that it can accommodate normal prices too
+    #Fix: Desconto foi substituido por pricing policy para acomodar precos normais tambem
     @policy.setter
     def policy(self, p: PricingPolicy): 
         self._policy = p
 
     # Métodos
-    #Error: Final_price calculated self._price.amoumt + self._policy.factor(), which lead to higher prices
-    #Fix: Changed + to *, applying the discount properly
+    #Error: Final_price calculava self._price.amount + self._policy.factor(), o que causava precos mais altos
+    #Fix: + foi alterado para *, agora aplicando o desconto corretamente
     def final_price(self) -> float:
         return self._price.amount * self._policy.factor()
 

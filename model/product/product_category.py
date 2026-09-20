@@ -1,7 +1,7 @@
 from enum import Enum
 
-#Error: Todos os valores de enum recebiam 1
-#Fixed - Valores do Enum foram atualizados
+#Error: Todos os valores do enum eram 1
+#Fix: Atualizar os valores do enum 
 class ProductType(Enum):
     ELECTRONICS = 1
     CLOTHING = 2
