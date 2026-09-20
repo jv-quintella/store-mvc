@@ -1,22 +1,24 @@
 from dataclasses import dataclass
-from .product_category import ProductType
-from .pricing import *
+from model.product.product_category import ProductType
+from model.product.pricing import PricingPolicy
 
-# Objetos de Valor
-@dataclass()
-class SKU:
-    code: str
-    
+#https://docs.python.org/3/library/dataclasses.html
+#Feat: Changed dataclasses to normal classes so that if statements could be used to verify empty lists or negative prices
+class SKU():
+    def __init__(self, code):
+        if not code.strip():
+            raise ValueError("O SKU nao pode estar vazio")
+        self.code = code
     def __str__(self):
         return self.code
 
-@dataclass()
 class Price:
-    amount: float
-    
+    def __init__(self, amount: float):
+        if amount < 0:
+            raise ValueError("O preco deve ser maior que zero")
+        self.amount = amount
     def __str__(self):
         return f"R$ {self.amount:.2f}"
-    
 
 class Product:
     def __init__(self, sku: SKU, name: str, price: Price, category: ProductType, policy: PricingPolicy = None):
@@ -48,13 +50,16 @@ class Product:
         return self._policy
     
     # Setters
+    #Feat: Changed discount to pricing policy so that it can accommodate normal prices too
     @policy.setter
     def policy(self, p: PricingPolicy): 
         self._policy = p
 
     # Métodos
+    #Error: Final_price calculated self._price.amoumt + self._policy.factor(), which lead to higher prices
+    #Fix: Changed + to *, applying the discount properly
     def final_price(self) -> float:
-        return self._price.amount + self._policy.factor()
+        return self._price.amount * self._policy.factor()
 
     def __repr__(self):
         return (f"Product(sku={self._sku!r}, name={self._name!r}, "
