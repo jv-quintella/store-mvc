@@ -3,19 +3,28 @@ from model.identity.customer import Customer
 
 class LineItem:
     def __init__(self, product: Product, quantity: int):
+        #Feat: Adicionada validacao para quantidade menor que zero
+        if quantity <= 0:
+            raise ValueError("A quantidade nao pode ser menor que 0")
         self._product = product
         self._quantity = quantity
 
     @property
     def product(self):
         return self._product
-    
+
     @property
     def quantity(self):
         return self._quantity
 
+    #Fix: .price alterado para final_price para corrigir typeError
     def subtotal(self) -> float:
-        return self._product.price * self._quantity
+        return self._product.final_price() * self._quantity
+
+    #Feat: Funcao criada para adicionar items ao carrinho
+    def add_quantity(self, quantity: int) -> None:
+        self._quantity += quantity
+
 
     def __str__(self):
         return f"{self._product.name} x {self._quantity} = R$ {self._product.final_price():.2f}"
@@ -36,14 +45,13 @@ class Cart:
     def items(self):
         return list(self._items)
 
+    #Feat: TODO concluido, funcao agora adiciona items no carrinho
+    #Return para sair da lista sem duplicar items
     def add(self, product: Product, qty: int) -> None:
         for item in self._items:
             if item.product.sku == product.sku:
-                # TODO: o que fazer aqui?
-                # remover o item antigo e adicionar um novo com qty somada?
-                # ou modificar o item existente?
-                # lembre que LineItem e imutavel... ou deveria ser?
-                pass
+                item.add_quantity(qty)
+                return
         self._items.append(LineItem(product, qty))
 
     def remove(self, sku: str) -> None:

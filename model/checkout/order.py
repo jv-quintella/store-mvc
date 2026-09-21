@@ -2,19 +2,25 @@ from enum import Enum, auto
 from uuid import uuid4
 from model.checkout.cart import Cart
 
+#Error: valores repetidos no Enum
+#Fix: Alterar valores no Enum
 class OrderStatus(Enum):
     PENDING = 1
-    PAID = 1
-    FULFILLED = 1
-    
+    PAID = 2
+    FULFILLED = 3
+
 class Order:
+#Error: logica incorreta causava um loop infinto: Pending -> Paid -> Fulfilled -> Pendings
+#Fix: Remover ultima linha
     _TRANSITIONS = {
         OrderStatus.PENDING:   OrderStatus.PAID,
         OrderStatus.PAID:      OrderStatus.FULFILLED,
-        OrderStatus.FULFILLED: OrderStatus.PENDING,
     }
 
     def __init__(self, cart: Cart):
+        if not cart.items:
+            raise ValueError("Pedido nao pode ser gerado a partir de um carrinho vazio")
+            
         self._order_id = str(uuid4())[:8]
         self._customer = cart.customer
         self._items = list(cart.items)
@@ -34,8 +40,12 @@ class Order:
 
     def total(self) -> float:
         return sum(i.subtotal() for i in self._items)
-
+    
+#Refactor: adicionada validacao para pedido ja finalizado
     def advance_status(self) -> None:
+        if self._status == OrderStatus.FULFILLED:
+            raise ValueError("Pedido ja finalizado") 
+        
         next_status = self._TRANSITIONS[self._status]
         self._status = next_status
 

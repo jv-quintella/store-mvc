@@ -2,6 +2,9 @@ from model.inventory.stock import StockItem
 
 class Shelf:
     def __init__(self, code: str):
+        #Refactor: Adicionada validacao para valores nulos
+        if not code.strip():
+            raise ValueError("A prateleira nao pode ser um valor vazio")
         self._code = code
         self._items: list[StockItem] = []
 
@@ -30,7 +33,10 @@ class Shelf:
 
 
 class Aisle:
+    #Refactor: Adicionada validacao para valores menores que zero
     def __init__(self, number: int):
+        if number <= 0:
+            raise ValueError("O corredor deve ser um valor maior que 0")
         self._number  = number
         self._shelves: list[Shelf] = []
 
